@@ -1,7 +1,7 @@
 import { render, c } from 'declarativas';
 
 class Particle {
-    static GRAVITY = 0.006;
+    static GRAVITY = 0.0001;
 
     constructor({ x, y, vx, vy, type }) {
         this.x = x;
@@ -17,7 +17,7 @@ class Particle {
         return new Particle({
             x: Math.floor(Math.random() * canvas.width),
             y: canvas.height - 20,
-            vy: 3,
+            vy: 0.2 + (Math.random() / 3.5),
             vx: 0,
             type: 'firework'
         });
@@ -29,18 +29,18 @@ class Particle {
         return new Particle({
             x: firework.x,
             y: firework.y,
-            vy: Math.sin(angle * Math.PI / 180) * Math.random(),
-            vx: Math.cos(angle * Math.PI / 180) * Math.random(),
+            vy: Math.sin(angle * Math.PI / 180) * (Math.random() / 8),
+            vx: Math.cos(angle * Math.PI / 180) * (Math.random() / 8),
             type: 'explosion'
         });
     }
 
-    update() {
-        this.vy -= Particle.GRAVITY;
+    update(delta) {
+        this.vy -= (Particle.GRAVITY * delta);
         this.vx /= 1.001;
-        this.y -= this.vy;
-        this.x += this.vx;
-        this.size -= 0.01;
+        this.y -= (this.vy * delta);
+        this.x += (this.vx * delta);
+        this.size = Math.max(0.5, this.size - (0.0005 * delta));
     }
 
     explode() {
@@ -62,10 +62,21 @@ function* generateState(initialState) {
         ...initialState
     };
 
+    document.addEventListener('keyup', (e) => {
+        if (e.code === 'Space') {
+            state.particles.push(Particle.firework());
+        }
+    });
+
+    let last = null;
+
     while(true) {
+        const now = performance.now();
+        const delta = last ? now - last : 0;
+        last = now;
         state.particles = state.particles
             .reduce((particles, particle) => {
-                particle.update();
+                particle.update(delta);
                 let explosions = [];
 
                 if (particle.vy <= 0 && particle.type === 'firework') {
@@ -89,7 +100,7 @@ function* generateState(initialState) {
             }, []);
         if (state.particles.length === 0) {
             state.particles = Array.from(
-                { length: 9 },
+                { length: 5 + Math.floor(Math.random() * 5) },
                 () => Particle.firework()
             );
         }
