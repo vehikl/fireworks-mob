@@ -1,7 +1,7 @@
 import { render, c } from 'declarativas';
 
 class Particle {
-    static GRAVITY = 0.0001;
+    static GRAVITY = 0.00007;
 
     constructor({ x, y, vx, vy, type }) {
         this.x = x;
@@ -29,8 +29,8 @@ class Particle {
         return new Particle({
             x: firework.x,
             y: firework.y,
-            vy: Math.sin(angle * Math.PI / 180) * (Math.random() / 8),
-            vx: Math.cos(angle * Math.PI / 180) * (Math.random() / 8),
+            vy: Math.sin(angle * Math.PI / 180) * (Math.random() / 6),
+            vx: Math.cos(angle * Math.PI / 180) * (Math.random() / 6),
             type: 'explosion'
         });
     }
@@ -138,9 +138,9 @@ const draw = (currentState) => {
 
 resizeCanvas();
 const backgroundColor = canvas.getContext('2d').createLinearGradient(0, 0, 0, canvas.height);
-backgroundColor.addColorStop(0, "#05054A");
-backgroundColor.addColorStop(0.6, "#191970");
-backgroundColor.addColorStop(1, "#9999E3");
+backgroundColor.addColorStop(0, "#05054A33");
+backgroundColor.addColorStop(0.6, "#19197033");
+backgroundColor.addColorStop(1, "#9999E333");
 
 draw(generateState({
     background: backgroundColor,
